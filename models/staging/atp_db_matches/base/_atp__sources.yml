@@ -1,0 +1,185 @@
+version: 2
+
+sources:
+  - name: atp
+    database: TFG
+    schema: BRONZE
+    description: >
+      Datos brutos provenientes de archivos oficiales del circuito ATP.
+    
+    quoting:
+      database: false
+      schema: false
+      identifier: false
+
+    tables:
+      - name: matches
+        description: "Partidos oficiales ATP. Tabla Raw (Bronze)."
+        
+        columns:
+          - name: tourney_id
+            description: "Identificador único del torneo."
+            tests:
+              - not_null
+
+          - name: tourney_name
+            description: "Nombre oficial del torneo."
+            tests:
+              - not_null
+
+          - name: surface
+            description: "Tipo de superficie."
+            tests:
+              - accepted_values:
+                  values: ['Hard', 'Clay', 'Grass', 'Carpet']
+
+          - name: draw_size
+            description: "Tamaño del cuadro."
+
+          - name: tourney_level
+            description: "Categoría del torneo."
+            tests:
+              - not_null
+              - accepted_values:
+                  values: ['G', 'M', 'A', 'D', 'F', 'O']
+
+          - name: tourney_date
+            description: "Fecha de inicio (Formato YYYYMMDD string)."
+            tests:
+              - not_null
+
+          - name: match_num
+            description: "Número secuencial del partido."
+            tests:
+              - not_null
+
+          - name: winner_id
+            description: "ID del ganador."
+            tests:
+              - not_null
+
+          - name: winner_entry
+            description: "Tipo de entrada del ganador."
+
+          - name: winner_name
+            description: "Nombre completo del ganador."
+            tests:
+              - not_null
+
+          - name: winner_hand
+            description: "Mano dominante."
+            tests:
+              - accepted_values:
+                  values: ['L', 'R', 'U', 'A']
+
+          - name: winner_ht
+            description: "Altura del ganador."
+
+          - name: winner_ioc
+            description: "Código de país (IOC)."
+            tests:
+              - dbt_expectations.expect_column_values_to_match_regex:
+                  regex: "^[A-Z]{3}$"
+                  config:
+                    severity: warn
+
+          - name: winner_age
+            description: "Edad del ganador."
+
+          - name: loser_id
+            description: "ID del perdedor."
+            tests:
+              - not_null
+
+          - name: loser_entry
+            description: "Tipo de entrada del perdedor."
+
+          - name: loser_name
+            description: "Nombre completo del perdedor."
+            tests:
+              - not_null
+
+          - name: loser_hand
+            description: "Mano dominante perdedor."
+            tests:
+              - accepted_values:
+                  values: ['L', 'R', 'U', 'A']
+
+          - name: loser_ht
+            description: "Altura del perdedor."
+
+          - name: loser_ioc
+            description: "Código de país (IOC) del perdedor."
+            tests:
+              - dbt_expectations.expect_column_values_to_match_regex:
+                  regex: "^[A-Z]{3}$"
+                  config:
+                    severity: warn
+
+          - name: loser_age
+            description: "Edad del perdedor."
+
+          - name: score
+            description: "Marcador final."
+
+          - name: best_of
+            description: "Sets máximos."
+            tests:
+              - accepted_values:
+                  values: ['3', '5'] 
+
+          - name: round
+            description: "Ronda del torneo."
+            tests:
+              - not_null
+              - accepted_values:
+                  values: ['F', 'SF', 'QF', 'R16', 'R32', 'RR', 'R128', 'R64', 'BR', 'ER']
+
+          - name: minutes
+            description: "Duración en minutos."
+
+          - name: w_ace
+            description: "Aces ganador."
+          - name: w_df
+            description: "Dobles faltas ganador."
+          - name: w_svpt
+            description: "Puntos saque ganador."
+          - name: w_1stIn
+            description: "1er servicio in ganador."
+          - name: w_1stWon
+            description: "Puntos ganados 1er servicio."
+          - name: w_2ndWon
+            description: "Puntos ganados 2do servicio."
+          - name: w_SvGms
+            description: "Juegos al saque ganador."
+          - name: w_bpSaved
+            description: "BP salvados ganador."
+          - name: w_bpFaced
+            description: "BP enfrentados ganador."
+          - name: l_ace
+            description: "Aces perdedor."
+          - name: l_df
+            description: "Dobles faltas perdedor."
+          - name: l_svpt
+            description: "Puntos saque perdedor."
+          - name: l_1stIn
+            description: "1er servicio in perdedor."
+          - name: l_1stWon
+            description: "Puntos ganados 1er servicio perdedor."
+          - name: l_2ndWon
+            description: "Puntos ganados 2do servicio perdedor."
+          - name: l_SvGms
+            description: "Juegos al saque perdedor."
+          - name: l_bpSaved
+            description: "BP salvados perdedor."
+          - name: l_bpFaced
+            description: "BP enfrentados perdedor."
+          
+          - name: winner_rank
+            description: "Ranking ganador."
+          - name: winner_rank_points
+            description: "Puntos ganador."
+          - name: loser_rank
+            description: "Ranking perdedor."
+          - name: loser_rank_points
+            description: "Puntos perdedor."

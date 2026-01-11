@@ -1,0 +1,323 @@
+version: 2
+
+models:
+  - name: base_atp_db__matches
+    description: >
+      Vista base de partidos filtrados y enriquecida.
+      Contiene tipos de datos casteados y claves surtidas generadas.
+    
+    # OPTIMIZACIÓN DELTA: 
+    # Si materializas esto como tabla, el clustering acelerará mucho los filtros por año y torneo.
+    config:
+      materialized: view 
+
+    columns:
+      - name: id_torneo_anio
+        description: ID único del torneo por año.
+        data_type: string
+        tests:
+          - not_null
+
+      - name: id_partido_estadisticas_gan
+        description: ID único para estadísticas (ganador).
+        data_type: string
+        tests:
+          - not_null
+
+      - name: id_partido_estadisticas_per
+        description: ID único para estadísticas (perdedor).
+        data_type: string
+        tests:
+          - not_null
+
+      - name: id_partido
+        description: ID único del partido.
+        data_type: string
+        tests:
+          - not_null
+
+      - name: id_torneo
+        description: ID hash del torneo.
+        data_type: string
+        tests:
+          - not_null
+
+      - name: nombre_torneo
+        description: Nombre oficial.
+        data_type: string
+        tests:
+          - not_null
+
+      - name: id_superficie
+        description: ID hash superficie.
+        data_type: string
+        tests:
+          - not_null
+
+      - name: superficie
+        description: Tipo de superficie (Hard, Clay, etc.).
+        data_type: string
+        tests:
+          - not_null
+
+      - name: total_jugadores
+        description: Jugadores en el cuadro.
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 2
+              strictly: true
+
+      - name: id_nivel_torneo
+        description: ID hash nivel.
+        data_type: string
+        tests:
+          - not_null
+
+      - name: nivel_torneo
+        description: Código nivel (G, M, A...).
+        data_type: string
+        tests:
+          - not_null
+
+      - name: fecha_inicio
+        description: Fecha inicio.
+        data_type: date
+        tests:
+          - not_null
+
+      - name: numero_partido_torneo
+        description: Secuencia del partido.
+        data_type: integer
+        tests:
+          - not_null
+
+      - name: id_ganador
+        description: ID hash ganador.
+        data_type: string
+        tests:
+          - not_null
+
+      - name: winner_name
+        description: Nombre ganador.
+        data_type: string
+        tests:
+          - not_null
+
+      - name: winner_hand
+        description: Mano dominante ganador.
+        data_type: string
+
+      - name: winner_ht
+        description: Altura ganador (cm).
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 140
+              max_value: 220
+              severity: warn
+
+      - name: winner_ioc
+        description: País ganador.
+        data_type: string
+
+      - name: winner_age
+        description: Edad ganador.
+        data_type: double
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 15
+              max_value: 45
+              severity: warn
+
+      - name: id_perdedor
+        description: ID hash perdedor.
+        data_type: string
+        tests:
+          - not_null
+
+      - name: loser_name
+        description: Nombre perdedor.
+        data_type: string
+        tests:
+          - not_null
+
+      - name: loser_hand
+        description: Mano dominante perdedor.
+        data_type: string
+
+      - name: loser_ht
+        description: Altura perdedor.
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 140
+              max_value: 220
+              severity: warn
+
+      - name: loser_ioc
+        description: País perdedor.
+        data_type: string
+
+      - name: loser_age
+        description: Edad perdedor.
+        data_type: double
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 15
+              max_value: 45
+              severity: warn
+
+      - name: resultado
+        description: Score.
+        data_type: string
+
+      - name: sets_maximos
+        description: Sets máximos (3 o 5).
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 1
+              max_value: 5
+
+      - name: id_ronda_torneo
+        description: ID hash ronda.
+        data_type: string
+        tests:
+          - not_null
+
+      - name: ronda_torneo
+        description: Ronda (QF, F...).
+        data_type: string
+        tests:
+          - not_null
+
+      - name: duracion_minutos
+        description: Duración (min).
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              severity: warn
+
+      - name: w_ace
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between: {min_value: 0}
+      - name: w_df
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between: {min_value: 0}
+      - name: w_svpt
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between: {min_value: 0}
+      - name: w_1stin
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between: {min_value: 0}
+      - name: w_1stwon
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between: {min_value: 0}
+      - name: w_2ndwon
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between: {min_value: 0}
+      - name: w_svgms
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between: {min_value: 0}
+      - name: w_bpsaved
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between: {min_value: 0}
+      - name: w_bpfaced
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between: {min_value: 0}
+      
+      - name: l_ace
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between: {min_value: 0}
+      - name: l_df
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between: {min_value: 0}
+      - name: l_svpt
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between: {min_value: 0}
+      - name: l_1stin
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between: {min_value: 0}
+      - name: l_1stwon
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between: {min_value: 0}
+      - name: l_2ndwon
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between: {min_value: 0}
+      - name: l_svgms
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between: {min_value: 0}
+      - name: l_bpsaved
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between: {min_value: 0}
+      - name: l_bpfaced
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between: {min_value: 0}
+
+      - name: winner_rank
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between: {min_value: 1}
+
+      - name: winner_rank_points
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between: {min_value: 0}
+
+      - name: loser_rank
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between: {min_value: 1}
+
+      - name: loser_rank_points
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between: {min_value: 0}
+
+      - name: ingesta_tmz
+        data_type: timestamp
+        tests:
+          - not_null
+
+      - name: year
+        description: Año del torneo.
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 1968
+              max_value: 2100
+
+
+      - name: slam_limpio
+        description: Nombre del torneo normalizado.
+        data_type: string
+
+      - name: player1_limpio
+        data_type: string
+
+      - name: player2_limpio
+        data_type: string
+
+      - name: match_id_unificada
+        description: ID único unificado.
+        data_type: string

@@ -1,0 +1,290 @@
+sources:
+  - name: extra_grand_slam
+    database: ALUMNO26_DEV_BRONZE_DB_ATP
+    schema: ATP_DB
+    
+    # Configuración anti-comillas para Databricks
+    quoting:
+      database: false
+      schema: false
+      identifier: false
+
+    tables:
+      - name: puntos_grand_slam
+        description: >
+          Dataset granular punto a punto de Grand Slam. Detalles de secuencia, estadísticas y contexto.
+        columns:
+          - name: match_id
+            description: "Identificador del partido."
+            tests:
+              - not_null
+
+          - name: elapsed_time
+            description: "Tiempo transcurrido (hh:mm:ss)."
+
+          - name: set_no
+            description: "Número del set actual."
+            tests:
+              - not_null
+              - accepted_values:
+                  values: ['1', '2', '3', '4', '5']
+
+          - name: p1_games_won
+            description: "Juegos ganados por p1 en el set."
+            # Tests numéricos desactivados en Bronze para evitar errores de cast
+
+          - name: p2_games_won
+            description: "Juegos ganados por p2 en el set."
+
+          - name: set_winner
+            description: "Ganador del set (si aplica)."
+            tests:
+              - accepted_values:
+                  values: ['0', '1', '2']
+
+          - name: game_winner
+            description: "Ganador del juego (si aplica)."
+            tests:
+              - accepted_values:
+                  values: ['0', '1', '2']
+
+          - name: game_no
+            description: "Número de juego del set."
+            tests:
+              - not_null
+
+          - name: point_number
+            description: "Identificador interno del punto."
+
+          - name: point_winner
+            description: "Jugador que ganó el punto (1 o 2)."
+            tests:
+              - accepted_values:
+                  values: ['0', '1', '2']
+
+          - name: point_server
+            description: "Jugador que sirvió (1 o 2)."
+            tests:
+              - accepted_values:
+                  values: ['0', '1', '2']
+
+          - name: speed_kmh
+            description: "Velocidad de saque (km/h)."
+
+          - name: rally
+            description: "Secuencia codificada del rally."
+
+          - name: p1_score
+            description: "Puntos p1."
+
+          - name: p2_score
+            description: "Puntos p2."
+
+          - name: p1_momentum
+            description: "Momentum p1."
+
+          - name: p2_momentum
+            description: "Momentum p2."
+
+          - name: p1_points_won
+            description: "Total puntos ganados p1."
+
+          - name: p2_points_won
+            description: "Total puntos ganados p2."
+
+          # --- Indicadores Booleanos (0/1) ---
+          - name: p1_ace
+            description: "Ace p1."
+            tests:
+              - accepted_values: {values: ['0', '1']}
+
+          - name: p2_ace
+            description: "Ace p2."
+            tests:
+              - accepted_values: {values: ['0', '1']}
+
+          - name: p1_winner
+            description: "Winner p1."
+            tests:
+              - accepted_values: {values: ['0', '1']}
+
+          - name: p2_winner
+            description: "Winner p2."
+            tests:
+              - accepted_values: {values: ['0', '1']}
+
+          - name: p1_double_fault
+            description: "Doble falta p1."
+            tests:
+              - accepted_values: {values: ['0', '1']}
+
+          - name: p2_double_fault
+            description: "Doble falta p2."
+            tests:
+              - accepted_values: {values: ['0', '1']}
+
+          - name: p1_unf_err
+            description: "Error no forzado p1."
+            tests:
+              - accepted_values: {values: ['0', '1']}
+
+          - name: p2_unf_err
+            description: "Error no forzado p2."
+            tests:
+              - accepted_values: {values: ['0', '1']}
+
+          - name: p1_net_point
+            description: "Subida a red p1."
+            tests:
+              - accepted_values: {values: ['0', '1']}
+
+          - name: p2_net_point
+            description: "Subida a red p2."
+            tests:
+              - accepted_values: {values: ['0', '1']}
+
+          - name: p1_net_point_won
+            description: "Punto ganado en red p1."
+            tests:
+              - accepted_values: {values: ['0', '1']}
+
+          - name: p2_net_point_won
+            description: "Punto ganado en red p2."
+            tests:
+              - accepted_values: {values: ['0', '1']}
+
+          - name: p1_break_point
+            description: "Break Point p1."
+            tests:
+              - accepted_values: {values: ['0', '1']}
+
+          - name: p2_break_point
+            description: "Break Point p2."
+            tests:
+              - accepted_values: {values: ['0', '1']}
+
+          - name: p1_break_point_won
+            description: "BP convertido p1."
+            tests:
+              - accepted_values: {values: ['0', '1']}
+
+          - name: p2_break_point_won
+            description: "BP convertido p2."
+            tests:
+              - accepted_values: {values: ['0', '1']}
+
+          - name: p1_first_srv_in
+            description: "1er saque in p1."
+            tests:
+              - accepted_values: {values: ['0', '1']}
+
+          - name: p2_first_srv_in
+            description: "1er saque in p2."
+            tests:
+              - accepted_values: {values: ['0', '1']}
+
+          - name: p1_first_srv_won
+            description: "Ganado con 1er saque p1."
+            tests:
+              - accepted_values: {values: ['0', '1']}
+
+          - name: p2_first_srv_won
+            description: "Ganado con 1er saque p2."
+            tests:
+              - accepted_values: {values: ['0', '1']}
+
+          - name: p1_second_srv_in
+            description: "2do saque in p1."
+            tests:
+              - accepted_values: {values: ['0', '1']}
+
+          - name: p2_second_srv_in
+            description: "2do saque in p2."
+            tests:
+              - accepted_values: {values: ['0', '1']}
+
+          - name: p1_second_srv_won
+            description: "Ganado con 2do saque p1."
+            tests:
+              - accepted_values: {values: ['0', '1']}
+
+          - name: p2_second_srv_won
+            description: "Ganado con 2do saque p2."
+            tests:
+              - accepted_values: {values: ['0', '1']}
+
+          - name: p1_forced_error
+            description: "Error forzado p1."
+            tests:
+              - accepted_values: {values: ['0', '1']}
+
+          - name: p2_forced_error
+            description: "Error forzado p2."
+            tests:
+              - accepted_values: {values: ['0', '1']}
+
+          # --- Metadatos adicionales ---
+          - name: history
+            description: "Eventos codificados (slamtracker)."
+
+          - name: speed_mph
+            description: "Velocidad (mph)."
+
+          - name: p1_break_point_missed
+            description: "BP fallado p1."
+
+          - name: p2_break_point_missed
+            description: "BP fallado p2."
+
+          - name: serve_indicator
+            description: "1er o 2do servicio."
+
+          - name: serve_direction
+            description: "Dirección saque."
+
+          - name: winner_fh
+            description: "Winner Drive."
+
+          - name: winner_bh
+            description: "Winner Revés."
+
+          - name: serving_to
+            description: "Lado de servicio."
+
+          - name: p1_turning_point
+            description: "Punto de inflexión p1."
+
+          - name: p2_turning_point
+            description: "Punto de inflexión p2."
+
+          - name: serve_number
+            description: "Número intento saque."
+
+          - name: winner_type
+            description: "Tipo winner."
+
+          - name: winner_shot_type
+            description: "Clasificación winner."
+
+          - name: p1_distance_run
+            description: "Distancia p1 (m)."
+
+          - name: p2_distance_run
+            description: "Distancia p2 (m)."
+
+          - name: rally_count
+            description: "Total golpes."
+
+          - name: serve_width
+            description: "Anchura saque."
+
+          - name: serve_depth
+            description: "Profundidad saque."
+
+          - name: return_depth
+            description: "Profundidad resto."
+
+          - name: ingesta_tmz
+            description: "Timestamp de ingesta en Databricks."
+            tests:
+              - not_null
