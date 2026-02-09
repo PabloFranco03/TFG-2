@@ -1,0 +1,51 @@
+version: 2
+
+models:
+  - name: stg_atp_db__ranking_atp
+    description: >
+      Histórico semanal del ranking ATP. Modelo incremental.
+      Permite analizar la evolución de puntos y posiciones de los jugadores a lo largo del tiempo.
+    config:
+      materialized: incremental
+      unique_key: 'id_ranking'
+      liquid_clustered_by: ['ranking_fecha', 'id_jugador']
+    columns:
+      - name: id_ranking
+        description: Identificador único del registro (Surrogate Key: Fecha + Jugador).
+        data_type: string
+        tests:
+          - not_null
+          - unique
+
+      - name: ranking_fecha
+        description: Fecha de publicación del ranking.
+        data_type: date
+        tests:
+          - not_null
+
+      - name: posicion_ranking
+        description: Posición numérica en el ranking ATP.
+        data_type: integer
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 1
+
+      - name: id_jugador
+        description: Identificador único del jugador (FK).
+        data_type: string
+        tests:
+          - not_null
+
+      - name: puntos
+        description: Puntos acumulados en el ranking.
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+
+      - name: ingesta_tmz
+        description: Timestamp de ingesta del dato en Databricks.
+        data_type: timestamp
+        tests:
+          - not_null
