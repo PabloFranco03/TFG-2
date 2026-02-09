@@ -1,0 +1,269 @@
+version: 2
+
+models:
+  - name: base_atp_db__points_gran_slam
+    description: >
+      Vista de puntos de partidos de Grand Slam, con granularidad punto a punto.
+    config:
+      materialized: view
+    columns:
+      - name: match_id
+        description: Identificador del partido.
+        data_type: string
+        tests:
+          - not_null
+
+      - name: tiempo_trancurrido
+        description: Tiempo transcurrido (segundos).
+        data_type: integer
+
+      - name: numero_set
+        description: Número del set.
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 1
+
+      - name: p1_juegos_ganados
+        description: Juegos ganados p1 (set actual).
+        data_type: integer
+
+      - name: p2_juegos_ganados
+        description: Juegos ganados p2 (set actual).
+        data_type: integer
+
+      - name: ganador_set
+        description: Ganador del set (1 o 2).
+        data_type: integer
+        tests:
+          - accepted_values:
+              values: [1, 2]
+
+      - name: numero_juego
+        description: Número del juego.
+        data_type: integer
+
+      - name: ganador_juego
+        description: Ganador del juego (1 o 2).
+        data_type: integer
+        tests:
+          - accepted_values:
+              values: [1, 2]
+
+      - name: numero_punto_partido
+        description: Secuencia del punto.
+        data_type: integer
+
+      - name: ganador_punto
+        description: Ganador del punto (1 o 2).
+        data_type: integer
+        tests:
+          - accepted_values:
+              values: [1, 2]
+
+      - name: sacador
+        description: Jugador al servicio (1 o 2).
+        data_type: integer
+        tests:
+          - accepted_values:
+              values: [1, 2]
+
+      - name: velocidad_saque_kmh
+        description: Velocidad saque (km/h).
+        # Spark SQL prefiere DOUBLE
+        data_type: double
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+
+      - name: rally
+        description: Detalle del rally.
+        data_type: string
+
+      - name: p1_score
+        description: Score p1 (texto).
+        data_type: string
+
+      - name: p2_score
+        description: Score p2 (texto).
+        data_type: string
+
+      - name: puntos_ganados_p1
+        description: Total puntos ganados p1.
+        data_type: integer
+
+      - name: puntos_ganados_p2
+        description: Total puntos ganados p2.
+        data_type: integer
+
+      - name: p1_ace
+        description: Ace p1 (0/1).
+        data_type: integer
+
+      - name: p2_ace
+        description: Ace p2 (0/1).
+        data_type: integer
+
+      - name: p1_winner
+        description: Winner p1 (0/1).
+        data_type: integer
+
+      - name: p2_winner
+        description: Winner p2 (0/1).
+        data_type: integer
+
+      - name: p1_double_fault
+        description: Doble falta p1 (0/1).
+        data_type: integer
+
+      - name: p2_double_fault
+        description: Doble falta p2 (0/1).
+        data_type: integer
+
+      - name: p1_unf_err
+        description: Error no forzado p1.
+        data_type: integer
+
+      - name: p2_unf_err
+        description: Error no forzado p2.
+        data_type: integer
+
+      - name: p1_net_point
+        description: Subida a red p1.
+        data_type: integer
+
+      - name: p2_net_point
+        description: Subida a red p2.
+        data_type: integer
+
+      - name: p1_net_point_won
+        description: Punto ganado en red p1.
+        data_type: integer
+
+      - name: p2_net_point_won
+        description: Punto ganado en red p2.
+        data_type: integer
+
+      - name: p1_break_point
+        description: Break point p1.
+        data_type: integer
+
+      - name: p2_break_point
+        description: Break point p2.
+        data_type: integer
+
+      - name: p1_break_point_won
+        description: BP convertido p1.
+        data_type: integer
+
+      - name: p2_break_point_won
+        description: BP convertido p2.
+        data_type: integer
+
+      - name: p1_break_point_missed
+        description: BP fallado p1.
+        data_type: integer
+
+      - name: p2_break_point_missed
+        description: BP fallado p2.
+        data_type: integer
+
+      - name: indicador_saque
+        description: Tipo de saque.
+        data_type: string
+
+      - name: numero_saque
+        description: Número de saque (1 o 2).
+        data_type: integer
+        tests:
+          - accepted_values:
+              values: [1, 2]
+
+      - name: tipo_winner
+        description: Tipo de winner.
+        data_type: string
+
+      - name: tipo_golpeo_winner
+        description: Técnica winner.
+        data_type: string
+
+      - name: distancia_recorrida_p1
+        description: Distancia p1 (m).
+        data_type: double
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+
+      - name: distancia_recorrida_p2
+        description: Distancia p2 (m).
+        data_type: double
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+
+      - name: rally_count
+        description: Golpes en el rally.
+        data_type: integer
+
+      - name: lateral_saque
+        description: Ancho del saque.
+        data_type: string
+
+      - name: profundidad_saque
+        description: Profundidad del saque.
+        data_type: string
+
+      - name: profundidad_resto
+        description: Profundidad del resto.
+        data_type: string
+
+      - name: ingesta_tmz
+        description: Timestamp ingesta.
+        data_type: timestamp
+        tests:
+          - not_null
+
+
+#---------------------------------------------------------------------------------------------------------------------------------------------------
+
+  - name: base_atp_db__matches_gran_slam
+    description: >
+      Vista filtrada de partidos de Grand Slam masculinos.
+    config:
+      materialized: view
+    columns:
+      - name: match_id_unificada_gan1
+        description: ID único (año + torneo + p1 + p2).
+        data_type: string
+        tests:
+          - not_null
+
+      - name: match_id_unificada_gan2
+        description: ID único inverso (año + torneo + p2 + p1).
+        data_type: string
+        tests:
+          - not_null
+
+      - name: match_id
+        description: ID original.
+        data_type: string
+        tests:
+          - not_null
+
+      - name: player1
+        description: Nombre jugador 1.
+        data_type: string
+        tests:
+          - not_null
+
+      - name: player2
+        description: Nombre jugador 2.
+        data_type: string
+        tests:
+          - not_null
+
+      - name: ingesta_tmz
+        description: Timestamp ingesta.
+        data_type: timestamp
+        tests:
+          - not_null

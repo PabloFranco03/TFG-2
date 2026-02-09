@@ -1,0 +1,486 @@
+version: 2
+
+models:
+  - name: stg_atp_db__torneos
+    description: >
+      Dimensión de torneos. Combina información básica y metadatos geográficos.
+    config:
+      materialized: table
+    columns:
+      - name: id_torneo
+        description: ID único del torneo.
+        data_type: string
+        tests:
+          - not_null
+
+      - name: nombre
+        description: Nombre oficial.
+        data_type: string
+        tests:
+          - not_null
+
+      - name: pais
+        description: País sede.
+        data_type: string
+
+      - name: ciudad
+        description: Ciudad sede.
+        data_type: string
+
+      - name: primera_edicion
+        description: Año de primera edición.
+        data_type: integer
+
+      - name: estadio_principal
+        description: Estadio principal.
+        data_type: string
+
+#-------------------------------------------------------------------------------------
+
+  - name: stg_atp_db__torneos_anio
+    description: >
+      Ediciones de torneos por año (Tabla de Hechos/Bridge).
+    config:
+      materialized: table
+      liquid_clustered_by: ['id_torneo', 'anio_inicio']
+    columns:
+      - name: id_torneo_anio
+        description: ID único edición.
+        data_type: string
+        tests:
+          - not_null
+          - unique
+
+      - name: id_torneo
+        description: FK Torneo base.
+        data_type: string
+        tests:
+          - not_null
+
+      - name: id_superficie
+        description: FK Superficie.
+        data_type: string
+        tests:
+          - not_null
+
+      - name: id_nivel_torneo
+        description: FK Nivel.
+        data_type: string
+        tests:
+          - not_null
+
+      - name: fecha_inicio
+        description: Fecha inicio.
+        data_type: date
+        tests:
+          - not_null
+
+      - name: anio_inicio
+        description: Año inicio.
+        data_type: integer
+
+      - name: mes_inicio
+        description: Mes inicio.
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 1
+              max_value: 12
+
+      - name: total_jugadores
+        description: Tamaño del cuadro.
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 2
+              max_value: 512
+
+#-------------------------------------------------------------------------------------
+
+  - name: stg_atp_db__nivel_torneo
+    description: Maestro de niveles de torneo.
+    config:
+      materialized: table
+    columns:
+      - name: id_nivel_torneo
+        description: ID nivel.
+        data_type: string
+        tests:
+          - not_null
+          - unique
+
+      - name: nivel_torneo
+        description: Código (G, M, A...).
+        data_type: string
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['A', 'G', 'O', 'F', 'M', 'D']
+
+      - name: nivel_torneo_desc
+        description: Descripción.
+        data_type: string
+        tests:
+          - not_null
+
+#-------------------------------------------------------------------------------------
+
+  - name: stg_atp_db__ronda_torneo
+    description: Maestro de rondas.
+    config:
+      materialized: table
+    columns:
+      - name: id_ronda_torneo
+        description: ID ronda.
+        data_type: string
+        tests:
+          - not_null
+          - unique
+
+      - name: ronda_torneo
+        description: Código ronda.
+        data_type: string
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['F', 'SF', 'QF', 'R16', 'R32', 'R64', 'R128', 'RR', 'BR', 'ER']
+
+      - name: ronda_torneo_desc
+        description: Descripción.
+        data_type: string
+        tests:
+          - not_null
+
+#-------------------------------------------------------------------------------------
+
+  - name: stg_atp_db__superficie
+    description: Maestro de superficies.
+    config:
+      materialized: table
+    columns:
+      - name: id_superficie
+        description: ID superficie.
+        data_type: string
+        tests:
+          - not_null
+          - unique
+
+      - name: superficie
+        description: Código superficie.
+        data_type: string
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Clay', 'Hard', 'Grass', 'Carpet']
+
+      - name: nombre_superficie
+        description: Descripción.
+        data_type: string
+        tests:
+          - not_null
+
+      - name: es_rapida
+        description: Booleano superficie rápida.
+        data_type: boolean
+        tests:
+          - not_null
+
+#-------------------------------------------------------------------------------------
+
+  - name: stg_atp_db__jugadores
+    description: Dimensión Jugadores unificada.
+    config:
+      materialized: table
+      liquid_clustered_by: ['id_jugador']
+    columns:
+      - name: id_jugador
+        description: ID único jugador.
+        data_type: string
+        tests:
+          - not_null
+          - unique
+
+      - name: nombre_jugador
+        description: Nombre completo.
+        data_type: string
+        tests:
+          - not_null
+
+      - name: mano_dominante
+        description: Mano (R, L, U).
+        data_type: string
+        tests:
+          - accepted_values:
+              values: ['R', 'L', 'U', 'A']
+              config:
+                where: "mano_dominante is not null"
+
+      - name: altura_cm
+        description: Altura (cm).
+        data_type: integer
+
+      - name: cod_pais
+        description: Código IOC.
+        data_type: string
+
+      - name: pais_desc
+        description: Nombre país.
+        data_type: string
+
+      - name: fecha_nacimiento
+        description: Fecha nacimiento.
+        data_type: date
+
+      - name: wikidata_id
+        description: ID externo.
+        data_type: string
+
+#-------------------------------------------------------------------------------------
+
+  - name: stg_atp_db__ranking_atp
+    description: Histórico de rankings.
+    config:
+      materialized: incremental
+      unique_key: 'id_ranking'
+      liquid_clustered_by: ['ranking_fecha', 'id_jugador']
+    columns:
+      - name: id_ranking
+        description: ID único.
+        data_type: string
+        tests:
+          - not_null
+          - unique
+
+      - name: ranking_fecha
+        description: Fecha ranking.
+        data_type: date
+        tests:
+          - not_null
+
+      - name: posicion_ranking
+        description: Rank.
+        data_type: integer
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 1
+
+      - name: id_jugador
+        description: ID jugador.
+        data_type: string
+        tests:
+          - not_null
+
+      - name: puntos
+        description: Puntos ATP.
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+
+      - name: ingesta_tmz
+        description: Timestamp ingesta.
+        data_type: timestamp
+        tests:
+          - not_null
+
+#-------------------------------------------------------------------------------------
+
+  - name: stg_atp_db__partidos
+    description: Tabla de hechos de partidos.
+    config:
+      materialized: incremental
+      unique_key: 'id_partido'
+      liquid_clustered_by: ['id_torneo_anio', 'id_ganador']
+    columns:
+      - name: id_partido
+        description: ID único partido.
+        data_type: string
+        tests:
+          - not_null
+          - unique
+
+      - name: id_torneo_anio
+        description: FK Edición torneo.
+        data_type: string
+        tests:
+          - not_null
+
+      - name: id_ronda_torneo
+        description: FK Ronda.
+        data_type: string
+        tests:
+          - not_null
+
+      - name: id_ganador
+        description: FK Ganador.
+        data_type: string
+        tests:
+          - not_null
+
+      - name: id_perdedor
+        description: FK Perdedor.
+        data_type: string
+        tests:
+          - not_null
+
+      - name: duracion_minutos
+        description: Duración (min).
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 10
+              severity: warn
+
+      - name: resultado
+        description: Marcador texto.
+        data_type: string
+        tests:
+          - not_null
+
+      - name: sets_maximos
+        description: Sets máximos (3 o 5).
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 1
+              max_value: 5
+
+      - name: numero_partido_torneo
+        description: Orden partido.
+        data_type: integer
+        tests:
+          - not_null
+
+      - name: ingesta_tmz
+        description: Timestamp ingesta.
+        data_type: timestamp
+        tests:
+          - not_null
+
+#-------------------------------------------------------------------------------------
+
+  - name: stg_atp_db__estadisticas_partido_jug
+    description: Estadísticas detalladas por jugador/partido.
+    config:
+      materialized: incremental
+      unique_key: 'id_partido_estadisticas'
+      liquid_clustered_by: ['id_partido', 'id_jugador']
+    columns:
+      - name: id_partido_estadisticas
+        description: ID único.
+        data_type: string
+        tests:
+          - not_null
+          - unique
+
+      - name: id_partido
+        description: ID partido.
+        data_type: string
+        tests:
+          - not_null
+
+      - name: id_jugador
+        description: ID jugador.
+        data_type: string
+        tests:
+          - not_null
+
+      - name: ha_ganado
+        description: Booleano victoria.
+        data_type: boolean
+        tests:
+          - not_null
+
+      - name: aces
+        description: Aces.
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+
+      - name: dobles_faltas
+        description: Dobles faltas.
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+
+      - name: puntos_saque
+        description: Puntos totales al saque.
+        data_type: integer
+
+      - name: primeros_saques
+        description: 1os servicios in.
+        data_type: integer
+
+      - name: puntos_ganados_1er
+        description: Ganados con 1er saque.
+        data_type: integer
+
+      - name: puntos_ganados_2do
+        description: Ganados con 2do saque.
+        data_type: integer
+
+      - name: juegos_saque
+        description: Juegos al saque.
+        data_type: integer
+
+      - name: bp_salvados
+        description: BP salvados.
+        data_type: integer
+
+      - name: bp_enfrentados
+        description: BP enfrentados.
+        data_type: integer
+
+      - name: ingesta_tmz
+        description: Timestamp ingesta.
+        data_type: timestamp
+        tests:
+          - not_null
+
+#-------------------------------------------------------------------------------------
+
+  - name: stg__date
+    description: Dimensión Fecha.
+    config:
+      materialized: table
+      liquid_clustered_by: ['date']
+    columns:
+      - name: date
+        description: Fecha.
+        data_type: date
+        tests:
+          - not_null
+          - unique
+
+      - name: anio
+        description: Año.
+        data_type: integer
+        tests:
+          - not_null
+
+      - name: mes
+        description: Mes (1-12).
+        data_type: integer
+        tests:
+          - not_null
+
+      - name: dia
+        description: Día (1-31).
+        data_type: integer
+        tests:
+          - not_null
+
+      - name: dia_semana
+        description: Día semana (1-7).
+        data_type: integer
+
+      - name: mes_nombre
+        description: Nombre mes.
+        data_type: string
+
+      - name: dia_nombre
+        description: Nombre día.
+        data_type: string

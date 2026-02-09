@@ -1,0 +1,32 @@
+version: 2
+
+models:
+  - name: int__union_ids
+    description: >
+      Tabla intermedia que cruza los partidos de la fuente ATP (base) con los datos
+      detallados de Grand Slam (puntos). Sirve como diccionario de traducción de IDs.
+    config:
+      materialized: table
+      liquid_clustered_by: ['id_partido']
+    columns:
+      - name: id_partido_otro
+        description: ID del partido en la fuente de Grand Slam (match_id).
+        data_type: string
+        tests:
+          - not_null
+          # Debería ser único para evitar duplicar filas al cruzar
+          - unique 
+
+      - name: id_partido
+        description: ID del partido en la fuente ATP estándar.
+        data_type: string
+        tests:
+          - not_null
+
+      - name: id_player1
+        description: ID unificado del Jugador 1 (según orden en fuente GS).
+        data_type: string
+
+      - name: id_player2
+        description: ID unificado del Jugador 2.
+        data_type: string

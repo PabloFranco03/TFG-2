@@ -1,0 +1,804 @@
+version: 2
+
+models:
+  - name: dim__torneos
+    description: "Dimensión que contiene información básica sobre los torneos de ATP, incluyendo su nombre, país, ciudad, primera edición y estadio principal."
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: id_torneo
+        description: "Identificador único del torneo."
+        data_type: string
+        tests:
+          - not_null
+          - unique
+        constraints:
+          - type: not_null
+
+      - name: nombre
+        description: "Nombre oficial del torneo."
+        data_type: string
+
+      - name: pais
+        description: "País donde se celebra el torneo."
+        data_type: string
+
+      - name: ciudad
+        description: "Ciudad donde se celebra el torneo."
+        data_type: string
+
+      - name: primera_edicion
+        description: "Año en que se celebró por primera vez el torneo."
+        data_type: integer
+
+      - name: estadio_principal
+        description: "Nombre del estadio principal donde se juega el torneo."
+        data_type: string
+
+#---------------------------------------------------------------------------------------------------------------------------------------------
+
+  - name: dim__superficie
+    description: "Dimensión que describe las características de las superficies en las que se juegan los torneos, incluyendo si son rápidas."
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: id_superficie
+        description: "Identificador único de la superficie."
+        data_type: string
+        tests:
+          - not_null
+          - unique
+        constraints:
+          - type: not_null
+
+      - name: superficie
+        description: "Código o tipo de la superficie (por ejemplo: CLAY, GRASS, HARD)."
+        data_type: string
+        tests:
+          - not_null
+        constraints:
+          - type: not_null
+
+      - name: nombre_superficie
+        description: "Nombre descriptivo de la superficie."
+        data_type: string
+
+      - name: es_rapida
+        description: "Indicador booleano que señala si la superficie se considera rápida."
+        data_type: boolean
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------
+
+  - name: dim__ronda_torneo
+    description: "Dimensión que define las diferentes rondas que componen un torneo, desde clasificatorias hasta la final."
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: id_ronda_torneo
+        description: "Identificador único de la ronda dentro del torneo."
+        data_type: string
+        tests:
+          - not_null
+          - unique
+        constraints:
+          - type: not_null
+
+      - name: ronda_torneo
+        description: "Código o abreviación de la ronda del torneo (por ejemplo: QF, SF, F)."
+        data_type: string
+        tests:
+          - not_null
+        constraints:
+          - type: not_null
+
+      - name: ronda_torneo_desc
+        description: "Descripción completa de la ronda del torneo."
+        data_type: string
+
+#---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  - name: dim__nivel_torneo
+    description: "Dimensión que clasifica los torneos según su nivel de importancia en el circuito ATP (por ejemplo: ATP 250, ATP 500, Masters 1000, Grand Slam)."
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: id_nivel_torneo
+        description: "Identificador único del nivel del torneo."
+        data_type: string
+        tests:
+          - not_null
+          - unique
+        constraints:
+          - type: not_null
+
+      - name: nivel_torneo
+        description: "Código del nivel del torneo (por ejemplo: 250, 500, M1000, GS)."
+        data_type: string
+        tests:
+          - not_null
+        constraints:
+          - type: not_null
+
+      - name: nivel_torneo_desc
+        description: "Descripción completa del nivel del torneo."
+        data_type: string
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------
+
+  - name: dim__jugadores
+    description: "Dimensión que contiene información sobre los jugadores de tenis, incluyendo su nacionalidad, altura y mano dominante."
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: id_jugador
+        description: "Identificador único del jugador."
+        data_type: string
+        tests:
+          - not_null
+          - unique
+        constraints:
+          - type: not_null
+
+      - name: nombre_jugador
+        description: "Nombre completo del jugador."
+        data_type: string
+        tests:
+          - not_null
+        constraints:
+          - type: not_null
+
+      - name: mano_dominante
+        description: "Código de la mano dominante del jugador (R para diestro, L para zurdo, U para desconocido)."
+        data_type: string
+
+      - name: mano_desc
+        description: "Descripción de la mano dominante del jugador: Diestro, Zurdo o Desconocido."
+        data_type: string
+
+      - name: altura_cm
+        description: "Altura del jugador en centímetros."
+        data_type: integer
+
+      - name: cod_pais
+        description: "Código de país (por ejemplo, ISO Alpha-3) que representa la nacionalidad del jugador."
+        data_type: string
+
+      - name: pais_desc
+        description: "Nombre del país de origen del jugador."
+        data_type: string
+      
+      - name: fecha_nacimiento
+        description: Fecha de nacimiento del jugador
+        data_type: date
+
+      - name: wikidata_id
+        description: ID de wikidata (si disponible)
+        data_type: string
+
+#--------------------------------------------------------------------------------------------------------------------------------------------
+
+  - name: dim__fecha
+    description: "Dimensión de fechas que proporciona atributos temporales para análisis a nivel de día, incluyendo año, mes, día de la semana y nombres correspondientes."
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: fecha
+        description: "Fecha en formato calendario (clave primaria natural)."
+        # Spark TIMESTAMP vs TIMESTAMP_NTZ: Usar date si solo es fecha, o timestamp
+        data_type: date 
+        tests:
+          - not_null
+          - unique
+        constraints:
+          - type: not_null
+
+      - name: anio
+        description: "Año correspondiente a la fecha."
+        data_type: integer
+        tests:
+          - not_null
+        constraints:
+          - type: not_null
+
+      - name: mes
+        description: "Número del mes (1-12) correspondiente a la fecha."
+        data_type: integer
+        tests:
+          - not_null
+        constraints:
+          - type: not_null
+
+      - name: dia
+        description: "Día del mes correspondiente a la fecha."
+        data_type: integer
+        tests:
+          - not_null
+        constraints:
+          - type: not_null
+
+      - name: dia_semana
+        description: "Número del día de la semana (1=domingo, 7=sábado, depende del estándar usado)."
+        data_type: integer
+
+      - name: mes_nombre
+        description: "Nombre del mes (por ejemplo: enero, febrero, etc.)."
+        data_type: string
+
+      - name: dia_nombre
+        description: "Nombre del día de la semana (por ejemplo: lunes, martes, etc.)."
+        data_type: string
+
+#----------------------------------------------------------------------------------------------------------------------------------------------
+
+  - name: dim__torneo_anio
+    description: "Dimensión que representa la realización de un torneo en un año específico, incluyendo superficie, nivel, fecha de inicio y cantidad de jugadores."
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: id_torneo_anio
+        description: "Identificador único del torneo en un año determinado."
+        data_type: string
+        tests:
+          - not_null
+          - unique
+        constraints:
+          - type: not_null
+
+      - name: id_torneo
+        description: "Identificador del torneo base."
+        data_type: string
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim__torneos')
+              field: id_torneo
+        constraints:
+          - type: not_null
+
+      - name: id_superficie
+        description: "Identificador de la superficie en la que se juega el torneo ese año."
+        data_type: string
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim__superficie')
+              field: id_superficie
+        constraints:
+          - type: not_null
+
+      - name: id_nivel_torneo
+        description: "Identificador del nivel del torneo para ese año."
+        data_type: string
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim__nivel_torneo')
+              field: id_nivel_torneo
+        constraints:
+          - type: not_null
+
+      - name: fecha_inicio
+        description: "Fecha de inicio del torneo en el año correspondiente."
+        data_type: date
+
+      - name: anio_inicio
+        description: "Año en que se juega la edición del torneo."
+        data_type: integer
+
+      - name: mes_inicio
+        description: "Mes en que inicia el torneo en ese año."
+        data_type: integer
+
+      - name: total_jugadores
+        description: "Cantidad total de jugadores que participaron en esa edición del torneo."
+        data_type: integer
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------
+
+  - name: dim__ranking_atp
+    description: "Tabla de hechos que registra la posición en el ranking ATP de cada jugador en fechas específicas, junto con los puntos obtenidos."
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: id_ranking
+        description: "Identificador único del registro de ranking."
+        data_type: string
+        tests:
+          - not_null
+          - unique
+        constraints:
+          - type: not_null
+
+      - name: ranking_fecha
+        description: "Fecha en la que se registró el ranking."
+        data_type: date
+
+      - name: posicion_ranking
+        description: "Posición del jugador en el ranking en la fecha correspondiente."
+        data_type: integer
+
+      - name: id_jugador
+        description: "Identificador del jugador en el ranking."
+        data_type: string
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim__jugadores')
+              field: id_jugador
+        constraints:
+          - type: not_null
+
+      - name: puntos
+        description: "Cantidad de puntos ATP que tiene el jugador en esa fecha."
+        data_type: integer
+
+      - name: ingesta_tmz
+        description: "Marca de tiempo de la ingesta del dato, usada para incrementalidad."
+        data_type: timestamp
+
+#--------------------------------------------------------------------------------------------------------------------------------------------
+
+  - name: fct__estadisticas_jugador_partido
+    description: "Tabla de hechos con estadísticas detalladas de desempeño por jugador en cada partido, incluyendo saques, puntos y break points."
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: id_partido_estadisticas
+        description: "Identificador único del conjunto de estadísticas del jugador en un partido."
+        data_type: string
+        tests:
+          - not_null
+          - unique
+        constraints:
+          - type: not_null
+
+      - name: id_partido
+        description: "Identificador del partido al que pertenecen estas estadísticas."
+        data_type: string
+        tests:
+          - not_null
+        constraints:
+          - type: not_null
+
+      - name: id_jugador
+        description: "Identificador del jugador al que pertenecen estas estadísticas."
+        data_type: string
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim__jugadores')
+              field: id_jugador
+        constraints:
+          - type: not_null
+
+      - name: ha_ganado
+        description: "Indicador de si el jugador ganó el partido."
+        data_type: boolean
+
+      - name: aces
+        description: "Cantidad de aces realizados por el jugador."
+        data_type: integer
+
+      - name: dobles_faltas
+        description: "Cantidad de dobles faltas cometidas por el jugador."
+        data_type: integer
+
+      - name: puntos_saque
+        description: "Cantidad total de puntos al saque jugados por el jugador."
+        data_type: integer
+
+      - name: primeros_saques
+        description: "Cantidad de primeros saques que el jugador realizó."
+        data_type: integer
+
+      - name: puntos_ganados_1er
+        description: "Puntos ganados con el primer saque."
+        data_type: integer
+
+      - name: puntos_ganados_2do
+        description: "Puntos ganados con el segundo saque."
+        data_type: integer
+
+      - name: juegos_saque
+        description: "Cantidad de juegos al saque que disputó el jugador."
+        data_type: integer
+
+      - name: bp_salvados
+        description: "Break points salvados por el jugador."
+        data_type: integer
+
+      - name: bp_enfrentados
+        description: "Break points enfrentados por el jugador."
+        data_type: integer
+
+      - name: id_torneo_anio
+        description: "Identificador del torneo en ese año en el que se jugó el partido."
+        data_type: string
+        tests:
+          - relationships:
+              to: ref('dim__torneo_anio')
+              field: id_torneo_anio
+
+      - name: id_ronda_torneo
+        description: "Identificador de la ronda del torneo."
+        data_type: string
+        tests:
+          - relationships:
+              to: ref('dim__ronda_torneo')
+              field: id_ronda_torneo
+
+      - name: id_ganador_partido
+        description: "Identificador del jugador que ganó el partido."
+        data_type: string
+        tests:
+          - relationships:
+              to: ref('dim__jugadores')
+              field: id_jugador
+
+      - name: id_perdedor_partido
+        description: "Identificador del jugador que perdió el partido."
+        data_type: string
+        tests:
+          - relationships:
+              to: ref('dim__jugadores')
+              field: id_jugador
+
+      - name: duracion_minutos
+        description: "Duración del partido en minutos."
+        data_type: integer
+
+      - name: resultado
+        description: "Marcador del partido (por ejemplo: 6-4 3-6 7-6)."
+        data_type: string
+
+      - name: sets_maximos
+        description: "Cantidad máxima de sets que se podían jugar en el partido."
+        data_type: integer
+
+      - name: numero_partido_torneo
+        description: "Orden del partido dentro del torneo."
+        data_type: integer
+
+      - name: ingesta_tmz
+        description: "Marca de tiempo de la ingesta del registro."
+        data_type: timestamp
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+  - name: fct__sets
+    description: "Modelo incremental de sets de Grand Slam."
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: id_set
+        description: Identificador único del set.
+        data_type: string
+        tests:
+          - not_null
+          - unique
+        constraints:
+          - type: not_null
+
+      - name: id_partido
+        description: Identificador del partido.
+        data_type: string
+        tests:
+          - not_null
+        constraints:
+          - type: not_null
+
+      - name: numero_set
+        description: Número del set.
+        data_type: integer
+        tests:
+          - not_null
+        constraints:
+          - type: not_null
+
+      - name: ganador_set_id
+        description: ID del ganador del set.
+        data_type: string
+        tests:
+          - relationships:
+              to: ref('dim__jugadores')
+              field: id_jugador
+
+      - name: perdedor_set_id
+        description: ID del perdedor del set.
+        data_type: string
+        tests:
+          - relationships:
+              to: ref('dim__jugadores')
+              field: id_jugador
+
+      - name: ganador_set_juegos
+        description: Juegos ganados (ganador).
+        data_type: integer
+
+      - name: perdedor_set_juegos
+        description: Juegos ganados (perdedor).
+        data_type: integer
+
+      - name: marcador_set
+        description: Marcador textual.
+        data_type: string
+
+      - name: ingesta_tmz
+        description: Timestamp ingesta.
+        data_type: timestamp
+        tests:
+          - not_null
+        constraints:
+          - type: not_null
+
+      - name: total_juegos_set
+        description: Suma total de juegos.
+        data_type: integer
+
+      - name: pct_juegos_ganados_ganador
+        description: % Juegos ganados (ganador).
+        data_type: float
+
+      - name: fue_tiebreak
+        description: TRUE si hubo tiebreak.
+        data_type: boolean
+
+      - name: set_decisivo
+        description: TRUE si fue el último set.
+        data_type: boolean
+
+#--------------------------------------------------------------------------------------------------------------------------------------------------
+
+  - name: fct__juegos
+    description: "Modelo incremental de juegos de Grand Slam."
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: id_juego
+        description: Identificador único del juego.
+        data_type: string
+        tests:
+          - not_null
+          - unique
+        constraints:
+          - type: not_null
+
+      - name: id_set
+        description: Identificador del set.
+        data_type: string
+        tests:
+          - not_null
+        constraints:
+          - type: not_null
+
+      - name: numero_juego
+        description: Número del juego.
+        data_type: integer
+
+      - name: ganador_juego_id
+        description: ID ganador juego.
+        data_type: string
+        tests:
+          - relationships:
+              to: ref('dim__jugadores')
+              field: id_jugador
+
+      - name: perdedor_juego_id
+        description: ID perdedor juego.
+        data_type: string
+        tests:
+          - relationships:
+              to: ref('dim__jugadores')
+              field: id_jugador
+
+      - name: sacador_id
+        description: ID sacador.
+        data_type: string
+        tests:
+          - relationships:
+              to: ref('dim__jugadores')
+              field: id_jugador
+
+      - name: ingesta_tmz
+        description: Timestamp ingesta.
+        data_type: timestamp
+        tests:
+          - not_null
+        constraints:
+          - type: not_null
+
+      - name: es_break
+        description: TRUE si hubo rotura de servicio.
+        data_type: boolean
+
+      - name: es_juego_servicio
+        description: TRUE si se ganó el saque.
+        data_type: boolean
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------
+
+  - name: fct__estadisticas_punto_jugador
+    description: "Modelo incremental de estadísticas punto a punto."
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: id_punto_estadisticas
+        description: ID único.
+        data_type: string
+        tests:
+          - not_null
+          - unique
+        constraints:
+          - type: not_null
+
+      - name: id_punto
+        description: ID punto original.
+        data_type: string
+
+      - name: id_jugador
+        description: ID jugador.
+        data_type: string
+        tests:
+          - relationships:
+              to: ref('dim__jugadores')
+              field: id_jugador
+        constraints:
+          - type: not_null
+
+      - name: id_partido
+        description: ID partido.
+        data_type: string
+
+      - name: id_torneo_anio
+        description: ID torneo año.
+        data_type: string
+        tests:
+          - relationships:
+              to: ref('dim__torneo_anio')
+              field: id_torneo_anio
+
+      - name: id_ronda_torneo
+        description: ID ronda.
+        data_type: string
+        tests:
+          - relationships:
+              to: ref('dim__ronda_torneo')
+              field: id_ronda_torneo
+
+      - name: velocidad_saque
+        description: Velocidad saque km/h.
+        data_type: float
+
+      - name: numero_saque
+        description: Número saque (1/2).
+        data_type: integer
+
+      - name: indicador_saque
+        description: Tipo saque.
+        data_type: string
+
+      - name: ha_ganado
+        description: Victoria en punto.
+        data_type: boolean
+
+      - name: ace
+        description: Ace (0/1).
+        data_type: integer
+
+      - name: doble_falta
+        description: Doble falta (0/1).
+        data_type: integer
+
+      - name: winner
+        description: Winner (0/1).
+        data_type: integer
+
+      - name: error_no_forzado
+        description: Error no forzado (0/1).
+        data_type: integer
+
+      - name: rally_count
+        description: Golpes rally.
+        data_type: integer
+
+      - name: resultado_momento_saque
+        description: Marcador al saque.
+        data_type: string
+
+      - name: bp_oportunidad
+        description: BP Oportunidad (0/1).
+        data_type: integer
+
+      - name: bp_convertido
+        description: BP Convertido (0/1).
+        data_type: integer
+
+      - name: bp_fallado
+        description: BP Fallado (0/1).
+        data_type: integer
+
+      - name: sube_red
+        description: Sube red (0/1).
+        data_type: integer
+
+      - name: gana_en_red
+        description: Gana en red (0/1).
+        data_type: integer
+
+      - name: tipo_winner
+        description: Tipo winner.
+        data_type: string
+
+      - name: tipo_golpeo_winner
+        description: Técnica winner.
+        data_type: string
+
+      - name: lateral_saque
+        description: Lateral saque.
+        data_type: string
+
+      - name: profundidad_saque
+        description: Profundidad saque.
+        data_type: string
+
+      - name: profundidad_resto
+        description: Profundidad resto.
+        data_type: string
+
+      - name: distancia_recorrida
+        description: Distancia recorrida.
+        data_type: float
+
+      - name: sets_maximos
+        description: Sets máximos partido.
+        data_type: integer
+
+      - name: numero_partido_torneo
+        description: Orden partido.
+        data_type: integer
+
+      - name: ingesta_tmz
+        description: Timestamp ingesta.
+        data_type: timestamp
+        constraints:
+          - type: not_null
+
+      - name: id_ganador_partido
+        description: ID ganador partido.
+        data_type: string
+
+      - name: id_perdedor_partido
+        description: ID perdedor partido.
+        data_type: string
+
+      - name: id_juego
+        description: ID juego.
+        data_type: string
+
+      - name: num_punto_partido
+        description: Secuencia punto.
+        data_type: string
+
+      - name: punto_winner
+        description: ID ganador punto.
+        data_type: string
+
+      - name: punto_loser
+        description: ID perdedor punto.
+        data_type: string
+
+      - name: rally_count_confirmado
+        description: Rally count verificado.
+        data_type: integer

@@ -1,0 +1,59 @@
+version: 2
+
+models:
+  - name: base_atp_db__jugadores
+    description: >
+      Vista de jugadores ATP con información básica como nombre, fecha de nacimiento,
+      nacionalidad y altura, proveniente de una fuente externa y transformada para análisis.
+    config:
+      materialized: view
+    columns:
+      - name: id_jugador
+        description: ID único del jugador, generado como surrogate key.
+        data_type: string
+        tests:
+          - not_null
+          - unique
+
+      - name: nombre
+        description: Nombre de pila del jugador.
+        data_type: string
+
+      - name: apellido
+        description: Apellido del jugador.
+        data_type: string
+
+      - name: nombre_completo
+        description: Nombre completo del jugador (nombre + apellido).
+        data_type: string
+
+      - name: mano_dominante
+        description: "Mano dominante del jugador (R: diestro, L: zurdo, U: desconocido)."
+        data_type: string
+
+      - name: fecha_nacimiento
+        description: Fecha de nacimiento del jugador.
+        data_type: date
+
+      - name: cod_pais
+        description: Código de país (IOC) del jugador.
+        data_type: string
+
+      - name: altura_cm
+        description: Altura del jugador en centímetros.
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 140
+              max_value: 220
+              severity: warn
+
+      - name: wikidata_id
+        description: ID del jugador en Wikidata (si está disponible).
+        data_type: string
+
+      - name: ingesta_tmz
+        description: Timestamp de ingesta del dato.
+        data_type: timestamp
+        tests:
+          - not_null

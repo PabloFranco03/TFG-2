@@ -1,0 +1,277 @@
+version: 2
+
+models:
+  - name: stg_atp_db__sets
+    description: >
+      Modelo incremental que resume información a nivel de set para partidos de Grand Slam.
+    # OPTIMIZACIÓN DELTA: Clustering por partido para búsquedas rápidas
+    config:
+      materialized: incremental
+      unique_key: 'id_set'
+      liquid_clustered_by: ['id_partido']
+    columns:
+      - name: id_partido
+        description: Identificador del partido.
+        data_type: string
+
+      - name: id_set
+        description: ID único del set.
+        data_type: string
+        tests:
+          - unique
+
+      - name: numero_set
+        description: Número de set.
+        data_type: integer
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 1
+
+      - name: ganador_set_id
+        description: ID del jugador que ganó el set.
+        data_type: string
+
+      - name: perdedor_set_id
+        description: ID del jugador que perdió el set.
+        data_type: string
+
+      - name: ganador_set_juegos
+        description: Juegos ganados por el ganador.
+        data_type: integer
+        tests:
+          - not_null:
+              severity: warn
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0  # Ajustado a 0 por posibles retiros/walkovers
+              max_value: 15
+              severity: warn
+
+      - name: perdedor_set_juegos
+        description: Juegos ganados por el perdedor.
+        data_type: integer
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 15
+
+      - name: marcador_set
+        description: Marcador textual (e.g. 6-4).
+        data_type: string
+        tests:
+          - not_null
+
+      - name: ingesta_tmz
+        description: Timestamp de ingesta.
+        data_type: timestamp
+        tests:
+          - not_null
+
+
+#--------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+  - name: stg_atp_db__juegos
+    description: >
+      Modelo incremental que resume información a nivel de juego.
+    # OPTIMIZACIÓN DELTA: Clustering jerárquico (Partido -> Set)
+    config:
+      materialized: incremental
+      unique_key: 'id_juego'
+      liquid_clustered_by: ['id_partido', 'id_set']
+    columns:
+      - name: id_juego
+        description: Identificador único del juego.
+        data_type: string
+        tests:
+          - not_null
+          - unique
+
+      - name: id_set
+        description: Identificador del set.
+        data_type: string
+        tests:
+          - not_null
+
+      - name: numero_juego
+        description: Número del juego.
+        data_type: integer
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 1
+
+      - name: ganador_game_id
+        description: ID del jugador que ganó el juego.
+        data_type: string
+
+      - name: perdedor_game_id
+        description: ID del jugador que perdió el juego.
+        data_type: string
+
+      - name: sacador_id
+        description: ID del sacador.
+        data_type: string
+
+      - name: ingesta_tmz
+        description: Timestamp de ingesta.
+        data_type: timestamp
+        tests:
+          - not_null
+
+
+#---------------------------------------------------------------------------------------------------------------------------------------------
+
+
+  - name: stg_atp_db__puntos
+    description: >
+      Modelo incremental granular punto a punto.
+    # OPTIMIZACIÓN DELTA: Clustering por juego para agrupar físicamente los puntos
+    config:
+      materialized: incremental
+      unique_key: 'id_punto'
+      liquid_clustered_by: ['id_juego']
+    columns:
+      - name: id_juego
+        description: Identificador del juego.
+        data_type: string
+        tests:
+          - not_null
+
+      - name: id_punto
+        description: Identificador único del punto.
+        data_type: string
+        tests:
+          - not_null
+          - unique
+
+      - name: num_punto_partido
+        description: Secuencial del punto en el partido.
+        data_type: integer
+        tests:
+          - not_null
+
+      - name: rally_count
+        description: Golpes en el rally.
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+
+      - name: resultado_momento_saque
+        description: Marcador al saque (e.g., 30-15).
+        data_type: string
+        tests:
+          - not_null
+
+      - name: punto_winner
+        description: ID del ganador del punto.
+        data_type: string
+
+      - name: punto_loser
+        description: ID del perdedor del punto.
+        data_type: string
+
+      - name: ingesta_tmz
+        description: Timestamp de ingesta.
+        data_type: timestamp
+        tests:
+          - not_null
+
+
+#---------------------------------------------------------------------------------------------------------------------------------------------
+
+
+  - name: stg_atp_db__estadisticas_punto_jug
+    description: >
+      Vista longitudinal detallada por jugador y punto.
+    # OPTIMIZACIÓN DELTA: Clustering por punto y jugador para análisis rápido
+    config:
+      materialized: incremental
+      unique_key: 'id_punto_estadisticas'
+      liquid_clustered_by: ['id_punto', 'id_jugador']
+    columns:
+      - name: id_punto_estadisticas
+        description: ID único (Punto + Jugador).
+        data_type: string
+        tests:
+          - not_null
+
+      - name: id_punto
+        description: ID del punto.
+        data_type: string
+        tests:
+          - not_null
+
+      - name: id_jugador
+        description: ID del jugador.
+        data_type: string
+
+      - name: es_jugador1
+        description: Booleano (Jugador 1 vs Jugador 2).
+        data_type: boolean
+        tests:
+          - not_null
+
+      - name: ha_ganado
+        description: TRUE si ganó el punto.
+        data_type: boolean
+        tests:
+          - not_null
+
+      - name: velocidad_saque
+        description: Velocidad en km/h.
+        # Spark SQL prefiere DOUBLE para decimales precisos
+        data_type: double
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+
+      - name: indicador_saque
+        description: Tipo de saque.
+        data_type: string
+
+      - name: numero_saque
+        description: Número de saque (1 o 2).
+        data_type: integer
+        tests:
+          - accepted_values:
+              values: [0, 1, 2]
+              config:
+                where: "numero_saque is not null"
+
+      - name: tipo_winner
+        description: Tipo de winner.
+        data_type: string
+
+      - name: tipo_golpeo_winner
+        description: Técnica del winner.
+        data_type: string
+
+      - name: rally_count
+        description: Golpes en el rally.
+        data_type: integer
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+
+      - name: lateral_saque
+        description: Zona lateral saque.
+        data_type: string
+
+      - name: profundidad_saque
+        description: Profundidad saque.
+        data_type: string
+
+      - name: profundidad_resto
+        description: Profundidad resto.
+        data_type: string
+
+      - name: ace
+        description: Indicador de Ace (0/1).
+        data_type: integer
+
+      - name: winner
+        description: Indicador de Winner (0/1).
+        data_type: integer

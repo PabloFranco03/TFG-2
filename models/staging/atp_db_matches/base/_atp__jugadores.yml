@@ -1,0 +1,55 @@
+sources:
+  - name: extra_jugadores
+    database: ALUMNO26_DEV_BRONZE_DB_ATP
+    schema: ATP_DB
+    description: >
+      Fuentes adicionales de metadatos de jugadores.
+    
+    # Configuración anti-comillas para Databricks
+    quoting:
+      database: false
+      schema: false
+      identifier: false
+
+    tables:
+      - name: jugadores
+        description: >
+          Tabla dimensional con información personal de jugadores ATP.
+        columns:
+          - name: player_id
+            description: "Identificador único del jugador."
+            tests:
+              - not_null
+              - unique
+
+          - name: name_first
+            description: "Primer nombre."
+
+          - name: name_last
+            description: "Apellido."
+
+          - name: hand
+            description: "Mano dominante (R, L, U)."
+            tests:
+              - accepted_values:
+                  values: ['R', 'L', 'U', 'A']
+                  # "A" suele aparecer como Ambidiestro o error, lo dejamos por si acaso.
+
+          - name: dob
+            description: >
+              Fecha de nacimiento (YYYYMMDD string).
+            # En Bronze no validamos formato fecha estricto para evitar fallos de lectura.
+
+          - name: ioc
+            description: "Código del país (COI)."
+
+          - name: height
+            description: "Altura en cm (puede ser nulo)."
+
+          - name: wikidata_id
+            description: "ID externo Wikidata."
+
+          - name: ingesta_tmz
+            description: "Marca temporal de carga en Databricks (Bronze)."
+            tests:
+              - not_null

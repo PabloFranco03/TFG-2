@@ -1,0 +1,46 @@
+version: 2
+
+models:
+  - name: stg__date
+    description: >
+      Dimensión de fechas generada automáticamente (2000-2030) para análisis temporal.
+    config:
+      materialized: table
+      liquid_clustered_by: ['date']
+    columns:
+      - name: date
+        description: Fecha completa (PK).
+        data_type: date
+        tests:
+          - not_null
+          - unique
+
+      - name: anio
+        description: Año numérico.
+        data_type: integer
+        tests:
+          - not_null
+
+      - name: mes
+        description: Mes numérico (1-12).
+        data_type: integer
+        tests:
+          - not_null
+
+      - name: dia
+        description: Día del mes (1-31).
+        data_type: integer
+        tests:
+          - not_null
+
+      - name: dia_semana
+        description: Número de día de semana (1=Domingo en Spark por defecto, ajustable).
+        data_type: integer
+
+      - name: mes_nombre
+        description: Nombre del mes (Enero, Febrero...).
+        data_type: string
+
+      - name: dia_nombre
+        description: Nombre abreviado del día (Mon, Tue...).
+        data_type: string

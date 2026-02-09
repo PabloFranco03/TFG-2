@@ -1,0 +1,83 @@
+sources:
+  - name: extra_grand_slam
+    database: ALUMNO26_DEV_BRONZE_DB_ATP
+    schema: ATP_DB
+    description: >
+      Datos detallados punto a punto de torneos Grand Slam.
+
+    # Configuración anti-comillas para Databricks (Vital)
+    quoting:
+      database: false
+      schema: false
+      identifier: false
+
+    tables:
+      - name: matches_grand_slam
+        description: >
+          Partidos individuales masculinos de torneos Grand Slam, con información básica de jugadores,
+          identificadores, evento y metadatos del entorno de juego.
+
+        columns:
+          - name: match_id
+            description: "Identificador único del partido (ej: 2024-wimbledon-1101)."
+            tests:
+              - not_null
+
+          - name: year
+            description: "Año del torneo."
+            tests:
+              - not_null
+
+          - name: slam
+            description: "Identificador del torneo (ej: wimbledon, roland_garros)."
+            tests:
+              - not_null
+
+          - name: match_num
+            description: "Número interno del partido dentro del torneo."
+
+          - name: player1
+            description: "Nombre del primer jugador."
+            tests:
+              - not_null
+
+          - name: player2
+            description: "Nombre del segundo jugador."
+            tests:
+              - not_null
+
+          - name: ingesta_tmz
+            description: "Timestamp de carga en Databricks."
+            tests:
+              - not_null
+
+          # Estos datos son informativos en esta capa o se cruzan más adelante
+          - name: status
+            description: "Estado final del partido (ej: Completed)."
+
+          - name: winner
+            description: "Nombre del jugador que ganó el partido."
+
+          - name: event_name
+            description: "Nombre oficial del evento (con año)."
+
+          - name: round
+            description: "Ronda del torneo (ej: QF, SF, F)."
+
+          - name: court_name
+            description: "Nombre de la pista."
+
+          - name: court_id
+            description: "Identificador de la pista."
+
+          - name: player1id
+            description: "ID interno del jugador 1."
+
+          - name: player2id
+            description: "ID interno del jugador 2."
+
+          - name: nation1
+            description: "Nacionalidad del jugador 1."
+
+          - name: nation2
+            description: "Nacionalidad del jugador 2."
