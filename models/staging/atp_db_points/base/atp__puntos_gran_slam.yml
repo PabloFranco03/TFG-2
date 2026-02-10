@@ -1,7 +1,7 @@
 sources:
   - name: extra_grand_slam
-    database: ALUMNO26_DEV_BRONZE_DB_ATP
-    schema: ATP_DB
+    database: tfg
+    schema: bronze
     
     # Configuración anti-comillas para Databricks
     quoting:

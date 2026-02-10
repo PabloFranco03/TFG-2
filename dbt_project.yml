@@ -19,16 +19,20 @@ clean-targets:
 models:
   proyecto_atp:
     # Configuración global para el proyecto (opcional)
-    +database: TFG  # En Databricks, 'database' en dbt equivale al Catálogo
+    +database: tfg  # En Databricks, 'database' en dbt equivale al Catálogo
+    +table_properties:
+      "delta.feature.allowColumnDefaults": "supported"
 
     # Capa de Staging 
     # Los modelos que pongas en la carpeta 'models/staging' irán a TFG.silver
     staging:
       +materialized: view
       +schema: silver 
+      +on_schema_change: "append_new_columns"
 
     # Capa de Marts
     # Los modelos que pongas en la carpeta 'models/marts' irán a TFG.gold
     marts:
       +materialized: table
       +schema: gold
+      +on_schema_change: "append_new_columns"

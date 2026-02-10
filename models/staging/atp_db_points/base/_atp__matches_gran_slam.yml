@@ -1,7 +1,7 @@
 sources:
   - name: extra_grand_slam
-    database: ALUMNO26_DEV_BRONZE_DB_ATP
-    schema: ATP_DB
+    database: tfg
+    schema: bronze
     description: >
       Datos detallados punto a punto de torneos Grand Slam.
 

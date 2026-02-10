@@ -6,7 +6,7 @@
 
 WITH source AS (
     SELECT *
-    FROM {{ source('extra_jugadores', 'jugadores') }}
+    FROM {{ source('extra_jugadores', 'players') }}
 ),
 
 renamed AS (
