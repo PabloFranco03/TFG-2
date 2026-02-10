@@ -2,8 +2,8 @@ version: 2
 
 sources:
   - name: atp
-    database: TFG
-    schema: BRONZE
+    database: tfg
+    schema: bronze
     description: >
       Datos brutos provenientes de archivos oficiales del circuito ATP.
     

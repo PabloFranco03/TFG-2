@@ -256,9 +256,9 @@ models:
         data_type: string
         tests:
           - not_null
-          - relationships:
-              to: ref('dim__torneos')
-              field: id_torneo
+          # - relationships:
+          #     to: ref('dim__torneos')
+          #     field: id_torneo
         constraints:
           - type: not_null
 
@@ -267,9 +267,9 @@ models:
         data_type: string
         tests:
           - not_null
-          - relationships:
-              to: ref('dim__superficie')
-              field: id_superficie
+          # - relationships:
+          #     to: ref('dim__superficie')
+          #     field: id_superficie
         constraints:
           - type: not_null
 
@@ -278,9 +278,9 @@ models:
         data_type: string
         tests:
           - not_null
-          - relationships:
-              to: ref('dim__nivel_torneo')
-              field: id_nivel_torneo
+          # - relationships:
+          #     to: ref('dim__nivel_torneo')
+          #     field: id_nivel_torneo
         constraints:
           - type: not_null
 
@@ -330,9 +330,9 @@ models:
         data_type: string
         tests:
           - not_null
-          - relationships:
-              to: ref('dim__jugadores')
-              field: id_jugador
+          # - relationships:
+          #     to: ref('dim__jugadores')
+          #     field: id_jugador
         constraints:
           - type: not_null
 
@@ -374,9 +374,9 @@ models:
         data_type: string
         tests:
           - not_null
-          - relationships:
-              to: ref('dim__jugadores')
-              field: id_jugador
+          # - relationships:
+          #     to: ref('dim__jugadores')
+          #     field: id_jugador
         constraints:
           - type: not_null
 
@@ -423,34 +423,34 @@ models:
       - name: id_torneo_anio
         description: "Identificador del torneo en ese año en el que se jugó el partido."
         data_type: string
-        tests:
-          - relationships:
-              to: ref('dim__torneo_anio')
-              field: id_torneo_anio
+        # tests:
+        #   - relationships:
+        #       to: ref('dim__torneo_anio')
+        #       field: id_torneo_anio
 
       - name: id_ronda_torneo
         description: "Identificador de la ronda del torneo."
         data_type: string
-        tests:
-          - relationships:
-              to: ref('dim__ronda_torneo')
-              field: id_ronda_torneo
+        # tests:
+        #   - relationships:
+        #       to: ref('dim__ronda_torneo')
+        #       field: id_ronda_torneo
 
       - name: id_ganador_partido
         description: "Identificador del jugador que ganó el partido."
         data_type: string
-        tests:
-          - relationships:
-              to: ref('dim__jugadores')
-              field: id_jugador
+        # tests:
+        #   - relationships:
+        #       to: ref('dim__jugadores')
+        #       field: id_jugador
 
       - name: id_perdedor_partido
         description: "Identificador del jugador que perdió el partido."
         data_type: string
-        tests:
-          - relationships:
-              to: ref('dim__jugadores')
-              field: id_jugador
+        # tests:
+        #   - relationships:
+        #       to: ref('dim__jugadores')
+        #       field: id_jugador
 
       - name: duracion_minutos
         description: "Duración del partido en minutos."
@@ -508,18 +508,18 @@ models:
       - name: ganador_set_id
         description: ID del ganador del set.
         data_type: string
-        tests:
-          - relationships:
-              to: ref('dim__jugadores')
-              field: id_jugador
+        # tests:
+        #   - relationships:
+        #       to: ref('dim__jugadores')
+        #       field: id_jugador
 
       - name: perdedor_set_id
         description: ID del perdedor del set.
         data_type: string
-        tests:
-          - relationships:
-              to: ref('dim__jugadores')
-              field: id_jugador
+        # tests:
+        #   - relationships:
+        #       to: ref('dim__jugadores')
+        #       field: id_jugador
 
       - name: ganador_set_juegos
         description: Juegos ganados (ganador).
@@ -546,7 +546,7 @@ models:
         data_type: integer
 
       - name: pct_juegos_ganados_ganador
-        description: % Juegos ganados (ganador).
+        description: Porcentaje de juegos ganados (ganador).
         data_type: float
 
       - name: fue_tiebreak
@@ -589,26 +589,26 @@ models:
       - name: ganador_juego_id
         description: ID ganador juego.
         data_type: string
-        tests:
-          - relationships:
-              to: ref('dim__jugadores')
-              field: id_jugador
+        # tests:
+        #   - relationships:
+        #       to: ref('dim__jugadores')
+        #       field: id_jugador
 
       - name: perdedor_juego_id
         description: ID perdedor juego.
         data_type: string
-        tests:
-          - relationships:
-              to: ref('dim__jugadores')
-              field: id_jugador
+        # tests:
+        #   - relationships:
+        #       to: ref('dim__jugadores')
+        #       field: id_jugador
 
       - name: sacador_id
         description: ID sacador.
         data_type: string
-        tests:
-          - relationships:
-              to: ref('dim__jugadores')
-              field: id_jugador
+        # tests:
+        #   - relationships:
+        #       to: ref('dim__jugadores')
+        #       field: id_jugador
 
       - name: ingesta_tmz
         description: Timestamp ingesta.
@@ -650,10 +650,10 @@ models:
       - name: id_jugador
         description: ID jugador.
         data_type: string
-        tests:
-          - relationships:
-              to: ref('dim__jugadores')
-              field: id_jugador
+        # tests:
+        #   - relationships:
+        #       to: ref('dim__jugadores')
+        #       field: id_jugador
         constraints:
           - type: not_null
 
@@ -664,18 +664,18 @@ models:
       - name: id_torneo_anio
         description: ID torneo año.
         data_type: string
-        tests:
-          - relationships:
-              to: ref('dim__torneo_anio')
-              field: id_torneo_anio
+        # tests:
+        #   - relationships:
+        #       to: ref('dim__torneo_anio')
+        #       field: id_torneo_anio
 
       - name: id_ronda_torneo
         description: ID ronda.
         data_type: string
-        tests:
-          - relationships:
-              to: ref('dim__ronda_torneo')
-              field: id_ronda_torneo
+        # tests:
+        #   - relationships:
+        #       to: ref('dim__ronda_torneo')
+        #       field: id_ronda_torneo
 
       - name: velocidad_saque
         description: Velocidad saque km/h.

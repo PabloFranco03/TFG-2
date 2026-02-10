@@ -5,7 +5,7 @@
 ) }}
 
 WITH fuente AS (
-    SELECT * FROM {{ source('extra_ranking', 'ranking_atp') }}
+    SELECT * FROM {{ source('atp_db', 'ranking_atp') }}
 ),
 
 casted AS (

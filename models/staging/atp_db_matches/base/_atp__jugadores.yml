@@ -1,7 +1,7 @@
 sources:
   - name: extra_jugadores
-    database: ALUMNO26_DEV_BRONZE_DB_ATP
-    schema: ATP_DB
+    database: tfg
+    schema: bronze
     description: >
       Fuentes adicionales de metadatos de jugadores.
     
@@ -12,7 +12,7 @@ sources:
       identifier: false
 
     tables:
-      - name: jugadores
+      - name: players
         description: >
           Tabla dimensional con información personal de jugadores ATP.
         columns:
