@@ -24,7 +24,7 @@ ganador AS (
         w_SvGms AS juegos_saque,
         w_bpSaved AS bp_salvados,
         w_bpFaced AS bp_enfrentados,
-        ingesta_tmz
+        CAST(ingesta_tmz AS TIMESTAMP) AS ingesta_tmz
     FROM source
     {% if is_incremental() %}
             where ingesta_tmz > (select max(ingesta_tmz) from {{ this }})
@@ -46,7 +46,7 @@ perdedor AS (
         l_SvGms AS juegos_saque,
         l_bpSaved AS bp_salvados,
         l_bpFaced AS bp_enfrentados,
-        ingesta_tmz
+        CAST(ingesta_tmz AS TIMESTAMP) AS ingesta_tmz
     FROM source
     {% if is_incremental() %}
             where ingesta_tmz > (select max(ingesta_tmz) from {{ this }})

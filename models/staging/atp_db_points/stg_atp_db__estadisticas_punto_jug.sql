@@ -82,7 +82,7 @@ jugador1 AS (
         p1_break_point_won AS bp_convertido,
         p1_break_point_missed AS bp_fallado,
         distancia_recorrida_p1 AS distancia_recorrida,
-        ingesta_tmz
+        CAST(ingesta_tmz AS TIMESTAMP) AS ingesta_tmz
     FROM puntos_enriquecidos
 ),
 
@@ -115,7 +115,7 @@ jugador2 AS (
         p2_break_point_won AS bp_convertido,
         p2_break_point_missed AS bp_fallado,
         distancia_recorrida_p2 AS distancia_recorrida,
-        ingesta_tmz
+        CAST(ingesta_tmz AS TIMESTAMP) AS ingesta_tmz
     FROM puntos_enriquecidos
 ),
 

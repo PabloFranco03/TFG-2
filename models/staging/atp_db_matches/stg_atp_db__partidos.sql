@@ -15,7 +15,7 @@ WITH partidos AS (
         resultado,
         sets_maximos,
         numero_partido_torneo,
-        ingesta_tmz
+        CAST(ingesta_tmz AS TIMESTAMP) AS ingesta_tmz
 
     FROM {{ ref('base_atp_db__matches') }}
     {% if is_incremental() %}

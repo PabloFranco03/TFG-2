@@ -1,7 +1,7 @@
 {{ config(
     materialized='incremental',
     unique_key='id_juego',
-    liquid_clustered_by=['id_partido', 'id_set']
+    liquid_clustered_by=['id_set']
 ) }}
 
 WITH puntos AS (
@@ -11,7 +11,7 @@ WITH puntos AS (
         numero_juego,
         ganador_juego,
         sacador,
-        ingesta_tmz
+        CAST(ingesta_tmz AS TIMESTAMP) AS ingesta_tmz
     FROM {{ ref('base_atp_db__points_gran_slam') }}
     WHERE ganador_juego != 0
 ),

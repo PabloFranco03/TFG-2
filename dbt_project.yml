@@ -20,7 +20,7 @@ models:
   proyecto_atp:
     # Configuración global para el proyecto (opcional)
     +database: tfg  # En Databricks, 'database' en dbt equivale al Catálogo
-    +table_properties:
+    +tbl_properties:
       "delta.feature.allowColumnDefaults": "supported"
 
     # Capa de Staging 

@@ -1,6 +1,9 @@
 {{ config(
     materialized='table',
-    liquid_clustered_by=['id_jugador']
+    liquid_clustered_by=['id_jugador'],
+    tbl_properties={
+        'delta.feature.allowColumnDefaults': 'supported'
+    }
 ) }}
 
 WITH source AS (
@@ -65,7 +68,11 @@ ioc_paises AS (
 ),
 
 jugadores_base AS (
-    SELECT id_jugador, fecha_nacimiento, wikidata_id
+    SELECT 
+        id_jugador, 
+        -- Usamos try_to_date para que '18890000' se convierta en NULL y no rompa el modelo
+        try_to_date(CAST(fecha_nacimiento AS STRING), 'yyyyMMdd') AS fecha_nacimiento, 
+        wikidata_id
     FROM {{ ref('base_atp_db__jugadores') }}
 ),
 
@@ -90,6 +97,14 @@ deduplicado AS (
     ) sub
 )
 
-SELECT *
+SELECT 
+    id_jugador,
+    nombre_jugador,
+    mano_dominante,
+    altura_cm,
+    cod_pais,
+    pais_desc,
+    fecha_nacimiento,
+    wikidata_id
 FROM deduplicado
 WHERE fila = 1
