@@ -14,7 +14,7 @@ WITH puntos AS (
         p1_score,
         p2_score,
         rally_count,
-        ingesta_tmz
+        CAST(ingesta_tmz AS TIMESTAMP) AS ingesta_tmz
     FROM {{ ref('base_atp_db__points_gran_slam') }}
     WHERE num_punto_partido IS NOT NULL
 ),

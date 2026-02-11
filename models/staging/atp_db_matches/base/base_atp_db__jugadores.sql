@@ -25,7 +25,7 @@ renamed AS (
         -- CAMBIO CLAVE: Sintaxis Spark para fechas
         -- 1. Convertimos a string por si viene como numero
         -- 2. Usamos el patrón 'yyyyMMdd'
-        to_date(CAST(dob AS STRING), 'yyyyMMdd') AS fecha_nacimiento,
+        try_to_date(CAST(dob AS STRING), 'yyyyMMdd') AS fecha_nacimiento,
         
         ioc AS cod_pais,
         

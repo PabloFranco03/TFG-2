@@ -11,7 +11,7 @@ WITH puntos AS (
         p1_juegos_ganados,
         p2_juegos_ganados,
         ganador_set,
-        ingesta_tmz
+        CAST(ingesta_tmz AS TIMESTAMP) AS ingesta_tmz
     FROM {{ ref('base_atp_db__points_gran_slam') }}
     WHERE ganador_set != 0
 ),

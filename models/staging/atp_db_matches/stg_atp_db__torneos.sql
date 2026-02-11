@@ -8,9 +8,9 @@ WITH torneo_base AS (
         MAX(nombre_torneo) AS nombre_torneo
     FROM {{ ref('base_atp_db__matches') }}
     GROUP BY id_torneo
-),
+)
 
 SELECT
     id_torneo,
-    nombre_torneo AS nombre,
+    nombre_torneo AS nombre
 FROM torneo_base 
